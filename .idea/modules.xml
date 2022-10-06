@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/8puzzle/8puzzle.iml" filepath="$PROJECT_DIR$/8puzzle/8puzzle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Algorithms.iml" filepath="$PROJECT_DIR$/Algorithms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BaseballElimination/BaseballElimination.iml" filepath="$PROJECT_DIR$/BaseballElimination/BaseballElimination.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CollinearPoint - Help/CollinearPoint - Help.iml" filepath="$PROJECT_DIR$/CollinearPoint - Help/CollinearPoint - Help.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Elastic Collision/Elastic Collision.iml" filepath="$PROJECT_DIR$/Elastic Collision/Elastic Collision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Event-Driven Simulation/Event-Driven Simulation.iml" filepath="$PROJECT_DIR$/Event-Driven Simulation/Event-Driven Simulation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Hello_World/Hello_World.iml" filepath="$PROJECT_DIR$/Hello_World/Hello_World.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Maths/Maths.iml" filepath="$PROJECT_DIR$/Maths/Maths.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Percolation/Percolation.iml" filepath="$PROJECT_DIR$/Percolation/Percolation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Recursion/Recursion.iml" filepath="$PROJECT_DIR$/Recursion/Recursion.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Sort/Sort.iml" filepath="$PROJECT_DIR$/Sort/Sort.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Stack/Stack.iml" filepath="$PROJECT_DIR$/Stack/Stack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UnionFind/UnionFind.iml" filepath="$PROJECT_DIR$/UnionFind/UnionFind.iml" />
+      <module fileurl="file://$PROJECT_DIR$/collinear/collinear.iml" filepath="$PROJECT_DIR$/collinear/collinear.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kd trees/kd trees.iml" filepath="$PROJECT_DIR$/kd trees/kd trees.iml" />
+      <module fileurl="file://$PROJECT_DIR$/queues/queues.iml" filepath="$PROJECT_DIR$/queues/queues.iml" />
+      <module fileurl="file://$PROJECT_DIR$/seam/seam.iml" filepath="$PROJECT_DIR$/seam/seam.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wordnet/wordnet.iml" filepath="$PROJECT_DIR$/wordnet/wordnet.iml" />
+    </modules>
+  </component>
+</project>
