@@ -3,7 +3,7 @@ import edu.princeton.cs.algs4.StdIn;
 
 public class Board {
     private final int[][] tiles;        // tiles represented as integer
-    private final int n;                // board length; board size is measured as (n x n)
+    private final int n;                // side length
 
     public Board(int[][] tiles) {
         if (tiles == null)

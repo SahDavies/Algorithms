@@ -186,11 +186,14 @@ public class SeamCarver {
             int v = q.dequeue();
 
             // ignore if vertex is in the first or last column
-            if (v % column == 0 || v % column == (column - 1)) continue;
+            boolean isOnFirstColumn = v % column == 0;
+            boolean isOnLastColumn = v % column == (column - 1);
+            if (!isOnFirstColumn || !isOnLastColumn) continue;
 
             // relax edge: v -> w
-            for (int count = 0; count < degree; count++) {
-                int w = v + count + (column - 1);
+            for (int i = 0; i < degree; i++) {
+                int[] shift = {-1, 0, 1};
+                int w = v + shift[i];
                 relax(v, w, distTo, edgeTo, q);
             }
         }
@@ -292,25 +295,18 @@ public class SeamCarver {
     }
 
     private void resizePictureRow(int[] seam) {
+        // note that temp array is smaller than picture array
         int grid = picture.length;
         int[] temp = new int[grid - seam.length];
-        int m = width;
-        int n = (grid / m) - 1;
-/*
- * Control variable in the for loop that column iterates through picture array
- * is the row and column from which the cell number is calculated
- * */
-        for (int col = 0; col < m; col++) {
-            for (int row = 0; row < n; row++) {
-                int cell = (row * m) + col;
-                if (row == seam[col]) {
-                    while (row < n) {
-                        temp[cell] = picture[cell+m];
-                        row++;
-                        cell = (row * m) + col;
-                    }
-                }
-                else temp[cell] = picture[cell];
+        int cols = width;
+        int rows = (grid / cols) - 1;
+
+        for (int j = 0; j < cols; j++) {
+            for (int i = 0; i < rows; i++) {
+                int cell = (i * cols) + j;
+                int cell_Shift = cell;
+                if (i == seam[j]) { cell_Shift = (i + 1) * cols + j; }
+                temp[cell] = picture[cell_Shift];
             }
         }
         picture = temp;
@@ -341,21 +337,16 @@ public class SeamCarver {
     }
 
     private void resizeEnergyTable(int[] seam) {
-        int m = energyTable.length;
-        int n = energyTable[0].length - 1;
-        double[][] temp = new double[m][n];
+        int row = energyTable.length;
+        int col = energyTable[0].length;
+        double[][] temp = new double[row][col - 1];
 
-        for (int row = 0; row < m; row++) {
-            for (int col = 0; col < n; col++) {
+        for (int i = 0; i < row; i++) {
+            int shift = 0;
+            for (int j = 0; j < temp[0].length; j++) {
                 // condition for shifting cells to the left
-                if (col == seam[row]) {
-                    while (col < n) {
-                        temp[row][col] = energyTable[row][col + 1];
-                        col++;
-                    }
-                }
-                else
-                    temp[row][col] = energyTable[row][col];
+                if (j == seam[i])   shift++;
+                temp[i][j] = energyTable[i][j + shift];
             }
         }
         energyTable = temp;
@@ -363,34 +354,29 @@ public class SeamCarver {
 
     private void resizePictureColumn(int[] seam) {
         int grid = picture.length;
-        int[] temp = new int[grid - seam.length];
-        int m = width;
+        int[] temp = new int[grid - seam.length];   // temp array is smaller than picture array by seam.length
+        int cols = width - 1;
+        int rows = (grid / width);
         int shift = 0;
-/*
- * variable that controls the for loop that iterates through
- * the picture array is the cell from which the corresponding
- * row and column number is calculated
- * */
-        for (int cell = 0; cell < grid; cell++) {
-            int row = cell / m;
-            int col = cell % m;
-            if (col == seam[row]) {
-                shift++;
-                continue;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int cell = (i * cols) + j;
+                if (j == seam[i])   shift++;
+                temp[cell] = picture[cell + shift];
             }
-            temp[cell-shift] = picture[cell];
         }
         picture = temp;
-        width--;
+        width--;    // update width
     }
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture input = new Picture("C:\\Users\\Sir_Davies\\Documents\\Cousera\\Algorithms Part II\\Test Files\\seam\\chameleon.png");
+        Picture input = new Picture("C:\\Users\\Sir_Davies\\Documents\\Cousera\\Algorithms Part II\\Test Files\\seam\\HJocean.png");
         SeamCarver sc = new SeamCarver(input);
         for (int i = 0; i < 75; i++) {
-            int[] seamH = sc.findHorizontalSeam();
-            sc.removeHorizontalSeam(seamH);
+            int[] seamH = sc.findVerticalSeam();
+            sc.removeVerticalSeam(seamH);
         }
         input.show();
         Picture output = sc.picture();

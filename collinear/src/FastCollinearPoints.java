@@ -39,8 +39,8 @@ public class FastCollinearPoints {
         for (int i = 0; i < (pointsCPY.length - 1); i++) {
             if (pointsCPY[i].compareTo(pointsCPY[i + 1]) == 0)
                 throw new IllegalArgumentException("There is a problem" +
-                        " with the points supplied (either there is repetition of point" +
-                        " or the point is a reference to null)");
+                        " with the points supplied (either there is duplicate points" +
+                        " or null reference)");
         }
 
         // pick a distinct pivot for each iteration

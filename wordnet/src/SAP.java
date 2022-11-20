@@ -7,15 +7,13 @@ import edu.princeton.cs.algs4.Queue;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SAP {
     private static final int SCA = 0;    // index of the shortest common ancestor, i.e. array[SCA] returns SCA
     private static final int LENGTH = 1;    // index of the LENGTH associated with SCA, array[LENGTH] returns the length
     private static final int SOURCES = 2;      // number of source vertices from which to find a common ancestor
     private final Digraph G;
-    private int[] cache;    // stores most recently computed vertices
-    private int[] result;
+    private LinkedHashMap<StringBuilder, int[]> cache = new LinkedHashMap<>();    // stores most recently computed vertices
 
     public SAP(Digraph G) {
         if (G == null)
@@ -152,50 +150,58 @@ public class SAP {
         }
     }
 
-    private int[] getResult(int[] key) {
-        int[] inverted = {key[1], key[0]};
-        if (Arrays.equals(key, cache) || Arrays.equals(inverted, cache))
-            return result;
-        // otherwise, update cache
-        cache = key;
-        return new int[0];
+    @SafeVarargs
+    private int[] getResult(Iterable<Integer>... collection) {
+        StringBuilder string = new StringBuilder();
+        for (Iterable<Integer> vertices : collection) {
+            for (Integer v : vertices) {
+                string.append(v);
+            }
+        }
+        int[] result = cache.get(string);
+        if (result != null)  return result;
+        result = bfs(collection[0], collection[1]);
+        cache.put(string, result);
+        return result;
+    }
+
+    private int[] getResult(int... collection) {
+        StringBuilder string = new StringBuilder();
+        for (int v : collection) {
+            string.append(v);
+        }
+        int[] result = cache.get(string);
+        if (result != null)  return result;
+        result = bfs(collection[0], collection[1]);
+        cache.put(string, result);
+        return result;
     }
 
     public int length(int v, int w) {
         validateVertex(Arrays.asList(v, w));
         // get saved result
-        int[] key = {v, w};
-        if (!Arrays.equals(getResult(key), new int[0]))
-            return result[LENGTH];
-
-        // otherwise, compute bfs
-        result = bfs(v, w);
+        int[] result = getResult(v, w);
         return result[LENGTH];
     }
 
     public int ancestor(int v, int w) {
         validateVertex(Arrays.asList(v, w));
         // get saved result
-        int[] key = {v, w};
-        if (!Arrays.equals(getResult(key), new int[0]))
-            return result[SCA];
-
-        // otherwise, compute bfs
-        result = bfs(v, w);
+        int[] result = getResult(v, w);
         return result[SCA];
     }
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
         validateVertex(v);
         validateVertex(w);
-        result = bfs(v, w);
+        int[] result = getResult(v, w);
         return result[LENGTH];
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
         validateVertex(v);
         validateVertex(w);
-        result = bfs(v, w);
+        int[] result = getResult(v, w);
         return result[SCA];
     }
 
