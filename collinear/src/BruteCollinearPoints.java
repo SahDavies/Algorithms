@@ -97,6 +97,7 @@ public class BruteCollinearPoints {
         }
         StdDraw.show();
         double time = timer.elapsedTime();
+        StdOut.println("Number of segments: " + collinear.numberOfSegments);
         StdOut.printf("\nElapsed time : (%.2f seconds)\n", time);
     }
 

@@ -57,16 +57,21 @@ public class FastCollinearPoints {
             }
 
             // find points collinear with pivot
-            for (int start = 0, index = 0; index < size; index++) {
-
+            int start, index;
+            boolean maximalCollinearPoint;
+            for (start = 0, index = 0; index < size; index++) {
                 if (slopes[start] != slopes[index]) {
-                    boolean maximalCollinearPoint = index - start >= 3;
+                    maximalCollinearPoint = index - start >= 3;
                     // add line segment only if it has found the maximal collinear point
                     if (maximalCollinearPoint && pivot.compareTo(pointsCPY[start]) < 0) {
                         segmentList.add(new LineSegment(pivot, pointsCPY[index-1]));
                     }
-                    start = index;
+                    start = index;  // update start
                 }
+            }
+            maximalCollinearPoint = index - start >= 3;
+            if (maximalCollinearPoint && pivot.compareTo(pointsCPY[start]) < 0) {
+                segmentList.add(new LineSegment(pivot, pointsCPY[index-1]));
             }
         }
 
@@ -104,6 +109,7 @@ public class FastCollinearPoints {
         }
         StdDraw.show();
         double time = timer.elapsedTime();
+        StdOut.println("Number of segments: " + collinear.numberOfSegments);
         StdOut.printf("\nElapsed time : (%.2f seconds)\n", time);
     }
 
