@@ -54,7 +54,7 @@ public class BruteCollinearPoints {
                 int freq = 0, endPoint = 0;
                 // count the frequency of occurrence of the selected slope, i
                 for (int j = 0; j < size; j++) {
-                    if (j < i && slopes[i] == slopes[j]) break; // skip
+                    if (j < i && slopes[i] == slopes[j]) break; // skip repeated slope
                     if (j >= i && slopes[i] == slopes[j]) {
                         freq++;
                         endPoint = j;   // track endpoint
