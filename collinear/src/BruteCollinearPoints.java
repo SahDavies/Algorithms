@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Stopwatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +88,7 @@ public class BruteCollinearPoints {
         }
         StdDraw.show();
 
+        Stopwatch timer = new Stopwatch();
         // print and draw the line segments
         BruteCollinearPoints collinear = new BruteCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
@@ -94,6 +96,8 @@ public class BruteCollinearPoints {
             segment.draw();
         }
         StdDraw.show();
+        double time = timer.elapsedTime();
+        StdOut.printf("\nElapsed time : (%.2f seconds)\n", time);
     }
 
     public LineSegment[] segments() {
