@@ -22,57 +22,47 @@ public class BruteCollinearPoints {
             throw new IllegalArgumentException("You have not supplied any point; " +
                     "The array is either empty or some element points to null ");
 
+        // local variables declaration
+        int size = points.length;
+        Point[] pointsCPY = Arrays.copyOf(points, size);
+        double[] slopes = new double[size];
+        ArrayList<LineSegment> segmentList = new ArrayList<>();
+
+        // sort the
+        Arrays.sort(pointsCPY);
         // throw an exception if the element in the array is repeated
-        for (int i = 0; i < (points.length - 1); i++) {
+        for (int i = 0; i < (size - 1); i++) {
             if (points[i].compareTo(points[i + 1]) == 0)
                 throw new IllegalArgumentException("There is a problem" +
                         " with the points supplied (either there is repetition of point" +
                         " or the point is a reference to null)");
         }
 
-        // local variables declaration
-        int n = points.length;
-        Point[] pointsCPY = Arrays.copyOf(points, n);
-        ArrayList<LineSegment> segmentList = new ArrayList<>();
+        // Pick a pivot
+        for (int idx = 0; idx < size; idx++) {
+            Point pivot = pointsCPY[idx];
 
-        // sort the
-        Arrays.sort(pointsCPY);
+            // build array of slopes with respect to pivot
+            for (int j = 0; j < size; j++) {
+                slopes[j] = pivot.slopeTo(pointsCPY[j]);
+            }
 
-        // find all line segments with 4 points
-        for (int i = 0; i < n; i++) {
-            Point origin = pointsCPY[i];
+            // find points collinear with pivot
+            for (int i = 0; i < size; i++) {
+                if (pivot.compareTo(pointsCPY[i]) >= 0) continue; // skip duplicate segment
 
-            // first subsegment
-            for (int j = 0; j < n; j++) {
-                Point first = pointsCPY[j];
-
-                if (origin.compareTo(first) >= 0)
-                    continue;
-
-                double slope1 = origin.slopeTo(first);
-
-                // second subsegment
-                for (int k = 0; k < n; k++) {
-                    Point second = pointsCPY[k];
-
-                    if (first.compareTo(second) >= 0)
-                        continue;
-
-                    double slope2 = origin.slopeTo(second);
-
-                    if (slope1 == slope2) {
-                        // third subsegment
-                        for (Point third : pointsCPY) {
-                            if (second.compareTo(third) >= 0)
-                                continue;
-
-                            double slope3 = origin.slopeTo(third);
-
-                            if (slope1 == slope3)
-                                segmentList.add(new LineSegment(origin, third));
-                        }
+                int freq = 0, endPoint = 0;
+                // count the frequency of occurrence of the selected slope, i
+                for (int j = 0; j < size; j++) {
+                    if (j < i && slopes[i] == slopes[j]) break; // skip
+                    if (j >= i && slopes[i] == slopes[j]) {
+                        freq++;
+                        endPoint = j;   // track endpoint
                     }
                 }
+                // if it is a maximal collinear point, add segment
+                if (freq >= 3)
+                    segmentList.add(new LineSegment(pivot, pointsCPY[endPoint]));
             }
         }
         lineSegments = segmentList.toArray(new LineSegment[0]);
@@ -80,7 +70,7 @@ public class BruteCollinearPoints {
     }
 
     public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
+        int n = StdIn.readInt();
         Point[] points = new Point[n];
         for (int i = 0; i < n; i++) {
             int x = StdIn.readInt();

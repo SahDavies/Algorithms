@@ -28,8 +28,9 @@ public class FastCollinearPoints {
                     "The array is either empty or some element points to null ");
 
         // local variable declarations
-        int n = points.length;
-        Point[] pointsCPY = Arrays.copyOf(points, n);
+        int size = points.length;
+        Point[] pointsCPY = Arrays.copyOf(points, size);
+        double[] slopes = new double[size];
         ArrayList<LineSegment> segmentList = new ArrayList<>();
 
         // sort array by natural order
@@ -43,47 +44,27 @@ public class FastCollinearPoints {
                         " or null reference)");
         }
 
-        // pick a distinct pivot for each iteration
-        for (int i = 0; i < n; i++) {
+        // outer loop picks a distinct pivot for each iteration
+        for (int i = 0; i < size; i++) {
             Arrays.sort(pointsCPY);
             Point pivot = pointsCPY[i];
             Arrays.sort(pointsCPY, pivot.slopeOrder());
 
-            // pick a second point and form a subsegment with pivot
-            for (int j = 1; j < n; j++) {
-                Point secondPT = pointsCPY[j];
+            // Build the array of slopes
+            for (int j = 0; j < size; j++) {
+                slopes[j] = pivot.slopeTo(pointsCPY[j]);
+            }
 
-                // evaluate slope and store in slope1
-                double slope1 = pivot.slopeTo(secondPT);
+            // find points collinear with pivot
+            for (int start = 0, index = 0; index < size; index++) {
 
-                // find a third point collinear with, form a subsegment with pivot
-                while (++j < n) {
-                    boolean flag = false;   // is true if 4 collinear point has been found
-                    Point endPoint = pointsCPY[j];
-                    double slope2 = pivot.slopeTo(endPoint);
-
-                    if (slope1 != slope2) {
-                        j--;
-                        break;
-                    } else {
-                        if (++j == n) break;
-                        endPoint = pointsCPY[j];
-                        slope2 = pivot.slopeTo(endPoint);
+                if (slopes[start] != slopes[index]) {
+                    boolean maximalCollinearPoint = index - start >= 3;
+                    // add line segment only if it has found the maximal collinear point
+                    if (maximalCollinearPoint && pivot.compareTo(pointsCPY[start]) < 0) {
+                        segmentList.add(new LineSegment(pivot, pointsCPY[index-1]));
                     }
-                    // find a fourth or more points collinear with pivot
-                    while (slope1 == slope2) {
-                        if (pivot.compareTo(secondPT) < 0) flag = true;
-                        if (++j == n) break;
-                        endPoint = pointsCPY[j];
-                        slope2 = pivot.slopeTo(endPoint);
-                    }
-                    endPoint = pointsCPY[--j];
-
-                    // add new line segment
-                    if (flag) {
-                        segmentList.add(new LineSegment(pivot, endPoint));
-                        break;
-                    }
+                    start = index;
                 }
             }
         }
@@ -113,7 +94,7 @@ public class FastCollinearPoints {
         }
         StdDraw.show();
 
-        // print and draw the line segments
+        // draw the line segments
         FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);

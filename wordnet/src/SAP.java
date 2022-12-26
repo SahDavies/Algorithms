@@ -7,19 +7,23 @@ import edu.princeton.cs.algs4.Queue;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class SAP {
     private static final int SCA = 0;    // index of the shortest common ancestor, i.e. array[SCA] returns SCA
     private static final int LENGTH = 1;    // index of the LENGTH associated with SCA, array[LENGTH] returns the length
     private static final int SOURCES = 2;      // number of source vertices from which to find a common ancestor
     private final Digraph G;
-    private LinkedHashMap<StringBuilder, int[]> cache = new LinkedHashMap<>();    // stores most recently computed vertices
+    private Set<Integer> cache;    // stores most recently computed vertices
+    private int[] result;
 
     public SAP(Digraph G) {
         if (G == null)
             throw new IllegalArgumentException("Null value supplied");
 
         this.G = new Digraph(G.V());
+        cache = new TreeSet<>();
 
         // make a copy of digraph
         for (int v = 0; v < G.V(); v++) {
@@ -152,28 +156,27 @@ public class SAP {
 
     @SafeVarargs
     private int[] getResult(Iterable<Integer>... collection) {
-        StringBuilder string = new StringBuilder();
+        Set<Integer> set = new TreeSet<>();
         for (Iterable<Integer> vertices : collection) {
             for (Integer v : vertices) {
-                string.append(v);
+                set.add(v);
             }
         }
-        int[] result = cache.get(string);
-        if (result != null)  return result;
+        if (set.equals(cache)) return result;
+        cache = set;
         result = bfs(collection[0], collection[1]);
-        cache.put(string, result);
         return result;
     }
 
     private int[] getResult(int... collection) {
-        StringBuilder string = new StringBuilder();
+        Set<Integer> set = new TreeSet<>();
         for (int v : collection) {
-            string.append(v);
+            set.add(v);
         }
-        int[] result = cache.get(string);
-        if (result != null)  return result;
+
+        if (set.equals(cache))  return result;
+        cache = set;
         result = bfs(collection[0], collection[1]);
-        cache.put(string, result);
         return result;
     }
 
