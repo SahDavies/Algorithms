@@ -79,6 +79,23 @@ public class FastCollinearPoints {
         numberOfSegments = segmentList.size();
     }
 
+    // returns the number of line segment
+    public int numberOfSegments() {
+        return numberOfSegments;
+    }
+
+    public LineSegment[] segments() {
+        return Arrays.copyOf(lineSegments, lineSegments.length);
+    }
+
+    private boolean isNull(Point[] points) {
+        if (points == null) return true;
+        for (Point point : points) {
+            if (point == null) return true;
+        }
+        return false;
+    }
+
     // test client
     public static void main(String[] args) {
         // read the n points from a file
@@ -111,26 +128,5 @@ public class FastCollinearPoints {
         double time = timer.elapsedTime();
         StdOut.println("Number of segments: " + collinear.numberOfSegments);
         StdOut.printf("\nElapsed time : (%.2f seconds)\n", time);
-    }
-
-    private boolean isNull(Point[] points) {
-        if (points == null)
-            return true;
-
-        for (Point point : points) {
-            if (point == null)
-                return true;
-        }
-
-        return false;
-    }
-
-    // returns the number of line segment
-    public int numberOfSegments() {
-        return numberOfSegments;
-    }
-
-    public LineSegment[] segments() {
-        return Arrays.copyOf(lineSegments, lineSegments.length);
     }
 }

@@ -108,6 +108,7 @@ public class BoggleSolver {
         // data used to visit the neighbors of a cell
         final int[] shift_I = { -1, -1, -1, 0, 0, 0, 1, 1, 1};
         final int[] shift_J = { -1, 0, 1 ,-1, 0, 1, -1, 0, 1};
+
         for (int k = 0; k < shift_I.length; k++) {
             int _i = i + shift_I[k];
             int _j = j + shift_J[k];

@@ -38,12 +38,10 @@ import java.util.NoSuchElementException;
 public class Deque<Item> implements Iterable<Item> {
     private class Node {
         Item item;
-        Node rightLink; // holds a reference to the least recent item
-        Node leftLink; // holds a reference to the most recent item
+        Node right, left;
     }
 
-    private Node first;
-    private Node last;
+    private Node first, last;
     private int size;
 
     public Deque() {
@@ -60,16 +58,16 @@ public class Deque<Item> implements Iterable<Item> {
         if (first == null) {
             first = new Node();
             first.item = item;
-            last = first;       // let last save a reference to the first item ever added
+            last = first;
             size++;
             return;
         }
 
-        Node oldFirst = first;
+        Node temp = first;
         first = new Node();
         first.item = item;
-        first.rightLink = oldFirst;
-        oldFirst.leftLink = first;
+        first.right = temp;
+        temp.left = first;
         size++; // update size
     }
 
@@ -87,8 +85,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         Item item = first.item;
-        first = first.rightLink;
-        first.leftLink = null;
+        first = first.right;
+        first.left = null;
         size--; // update size
         return item;
     }
@@ -109,8 +107,8 @@ public class Deque<Item> implements Iterable<Item> {
         Node oldLast = last;
         last = new Node();
         last.item = item;
-        last.leftLink = oldLast;
-        oldLast.rightLink = last;
+        last.left = oldLast;
+        oldLast.right = last;
         size++; // update size
     }
 
@@ -128,8 +126,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         Item item = last.item;
-        last = last.leftLink;
-        last.rightLink = null;
+        last = last.left;
+        last.right = null;
         size--; // update size
         return item;
     }
@@ -162,7 +160,7 @@ public class Deque<Item> implements Iterable<Item> {
                 throw new NoSuchElementException();
 
             Item item = current.item;
-            current = current.rightLink;
+            current = current.right;
             return item;
         }
 

@@ -55,8 +55,8 @@ public class BruteCollinearPoints {
                 int freq = 0, endPoint = 0;
                 // count the frequency of occurrence of the selected slope, i
                 for (int j = 0; j < size; j++) {
-                    if (j < i && slopes[i] == slopes[j]) break; // skip repeated slope
-                    if (j >= i && slopes[i] == slopes[j]) {
+                    if (slopes[i] == slopes[j]) {
+                        if (j < i) break;   // skip repeated slope
                         freq++;
                         endPoint = j;   // track endpoint
                     }
@@ -68,6 +68,22 @@ public class BruteCollinearPoints {
         }
         lineSegments = segmentList.toArray(new LineSegment[0]);
         numberOfSegments = segmentList.size();
+    }
+
+    public LineSegment[] segments() {
+        return Arrays.copyOf(lineSegments, lineSegments.length);
+    }
+
+    public int numberOfSegments() {
+        return numberOfSegments;
+    }
+
+    private boolean isNull(Point[] points) {
+        if (points == null) return true;
+        for (Point point : points) {
+            if (point == null) return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) {
@@ -99,25 +115,5 @@ public class BruteCollinearPoints {
         double time = timer.elapsedTime();
         StdOut.println("Number of segments: " + collinear.numberOfSegments);
         StdOut.printf("\nElapsed time : (%.2f seconds)\n", time);
-    }
-
-    public LineSegment[] segments() {
-        return Arrays.copyOf(lineSegments, lineSegments.length);
-    }
-
-    public int numberOfSegments() {
-        return numberOfSegments;
-    }
-
-    private boolean isNull(Point[] points) {
-        if (points == null)
-            return true;
-
-        for (Point point : points) {
-            if (point == null)
-                return true;
-        }
-
-        return false;
     }
 }

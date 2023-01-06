@@ -6,7 +6,6 @@ import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.Queue;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,7 +35,7 @@ public class SAP {
     // Method returns both the SCA and its associated path LENGTH. Lockstep approach is used
     private int[] bfs(int s1, int s2) {
         // Case: when source1 and source2 are equivalent
-        if (s1 == s2)   return new int[] {s1, 0};
+        if (s1 == s2) return new int[]{s1, 0};
 
         // 2d array data structure used for processing bfs operation
         boolean[][] marked = new boolean[SOURCES][G.V()];
@@ -54,10 +53,8 @@ public class SAP {
         q[1].enqueue(s1);
 
         // this point in the program flow marks the main operation in finding sca
-        int sca = lockstepBFS(q, marked, distTo);
-        int length = (sca != -1) ? distTo[0][sca] + distTo[1][sca] : -1;
-        return new int[] {sca, length};
-    }   // end bfs
+        return lockstepBFS(q, marked, distTo);
+    }
 
     // Overloaded version
     private int[] bfs(Iterable<Integer> s1, Iterable<Integer> s2) {
@@ -84,12 +81,10 @@ public class SAP {
             }
         }
         // main operation in finding sca if the program flow reaches this point
-        int sca = lockstepBFS(q, marked, distTo);
-        int length = (sca != -1) ? distTo[0][sca] + distTo[1][sca] : -1;
-        return new int[] {sca, length};
+        return lockstepBFS(q, marked, distTo);
     }
 
-    private int lockstepBFS(Queue<Integer>[] q, boolean[][] marked, int[][] distTo) {
+    private int[] lockstepBFS(Queue<Integer>[] q, boolean[][] marked, int[][] distTo) {
         int sca = -1;     // shortest common ancestor
         int length = Integer.MAX_VALUE;
 
@@ -102,7 +97,7 @@ public class SAP {
 
         // break loop if both queues are empty
         while (!q[0].isEmpty() || !q[1].isEmpty()) {
-            int cycle = counter % SOURCES;    // possible values of variable cycle is in the range [0, SOURCES - 1]
+            int cycle = counter % SOURCES;    // possible values of variable - cycle is in the range [0, SOURCES - 1]
 
             // this loop selects a queue and if queue selected is not empty, the block is executed
             while (!q[cycle].isEmpty()) {
@@ -134,7 +129,7 @@ public class SAP {
             }   // end of inner while block
             counter++;  // update counter
         }   // end outer while block
-        return sca;
+        return new int[] {sca, length};
     }
 
     private void validateVertex(int v) {
@@ -198,7 +193,7 @@ public class SAP {
         validateVertex(v);
         validateVertex(w);
         int[] result = getResult(v, w);
-        return result[LENGTH];
+        return (result[SCA] == -1) ? -1 : result[LENGTH];
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
