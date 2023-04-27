@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/Algorithms.iml" filepath="$PROJECT_DIR$/Algorithms.iml" />
       <module fileurl="file://$PROJECT_DIR$/BaseballElimination/BaseballElimination.iml" filepath="$PROJECT_DIR$/BaseballElimination/BaseballElimination.iml" />
       <module fileurl="file://$PROJECT_DIR$/Boggle/Boggle.iml" filepath="$PROJECT_DIR$/Boggle/Boggle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Burrows/Burrows.iml" filepath="$PROJECT_DIR$/Burrows/Burrows.iml" />
       <module fileurl="file://$PROJECT_DIR$/Elastic Collision/Elastic Collision.iml" filepath="$PROJECT_DIR$/Elastic Collision/Elastic Collision.iml" />
       <module fileurl="file://$PROJECT_DIR$/Event-Driven Simulation/Event-Driven Simulation.iml" filepath="$PROJECT_DIR$/Event-Driven Simulation/Event-Driven Simulation.iml" />
       <module fileurl="file://$PROJECT_DIR$/Hello_World/Hello_World.iml" filepath="$PROJECT_DIR$/Hello_World/Hello_World.iml" />

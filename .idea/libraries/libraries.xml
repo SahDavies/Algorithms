@@ -1,10 +1,11 @@
 <component name="libraryTable">
   <library name="libraries">
-    <CLASSES />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Documents/Cousera/Algorithms Part II/Library/algs4.jar!/" />
+    </CLASSES>
     <JAVADOC />
-    <NATIVE>
-      <root url="file://$USER_HOME$/Documents/Cousera/Algorithms Part I/Percolation/.idea/libraries" />
-    </NATIVE>
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Documents/Cousera/Algorithms Part II/Library/algs4.jar!/" />
+    </SOURCES>
   </library>
 </component>
