@@ -43,10 +43,12 @@ public class BurrowsWheeler {
             next[count[transform.codePointAt(i)]++] = i;
         }
         // write back the original file
+        StringBuilder sb = new StringBuilder();
         for (int i = next[first]; true; i = next[i]) {
-            BinaryStdOut.write(transform.charAt(i));
+            sb.append(transform.charAt(i));
             if (next[i] == next[first]) break;
         }
+        BinaryStdOut.write(sb.toString());
         BinaryStdIn.close();
         BinaryStdOut.close();
     }
@@ -54,7 +56,7 @@ public class BurrowsWheeler {
     // if args[0] is "-", apply Burrows-Wheeler transform
     // if args[0] is "+", apply Burrows-Wheeler inverse transform
     public static void main(String[] args) {
-        if (args[0] == "-") transform();
-        if (args[0] == "+") inverseTransform();
+        if (args[0].equals("-")) transform();
+        if (args[0].equals("+")) inverseTransform();
     }
 }

@@ -54,7 +54,7 @@ public class MoveToFront {
     }
 
     public static void main(String[] args) {
-        if (args[0] == "-") encode();
-        if (args[0] == "+") decode();
+        if (args[0].equals("-")) encode();
+        if (args[0].equals("+")) decode();
     }
 }
