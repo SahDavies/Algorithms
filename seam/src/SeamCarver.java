@@ -185,15 +185,15 @@ public class SeamCarver {
         while (!q.isEmpty()) {
             int v = q.dequeue();
 
-            // ignore if vertex is in the first or last column
-            boolean isOnFirstColumn = v % column == 0;
-            boolean isOnLastColumn = v % column == (column - 1);
-            if (!isOnFirstColumn || !isOnLastColumn) continue;
-
             // relax edge: v -> w
             for (int i = 0; i < degree; i++) {
-                int[] shift = {-1, 0, 1};
-                int w = v + shift[i];
+                int[] offset_J = {-1, 0, 1};
+                int offset_I = 1;
+                int _J = (v % column) + offset_J[i];
+                int _I = (v / column) + offset_I;
+                boolean inRange = (_J >= 0 && _J < column) && (_I < row);
+                if (!inRange) continue;
+                int w = (_I*column) + _J;
                 relax(v, w, distTo, edgeTo, q);
             }
         }
@@ -372,7 +372,7 @@ public class SeamCarver {
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture input = new Picture("C:\\Users\\Sir_Davies\\Documents\\Cousera\\Algorithms Part II\\Test Files\\seam\\HJocean.png");
+        Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\chameleon.png");
         SeamCarver sc = new SeamCarver(input);
         for (int i = 0; i < 75; i++) {
             int[] seamH = sc.findVerticalSeam();
