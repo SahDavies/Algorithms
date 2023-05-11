@@ -37,19 +37,23 @@ public class PrintSeams {
 
         SeamCarver carver = new SeamCarver(picture);
 
-        StdOut.printf("Vertical seam: { ");
-        int[] verticalSeam = carver.findVerticalSeam();
-        for (int x : verticalSeam)
-            StdOut.print(x + " ");
-        StdOut.println("}");
-        printSeam(carver, verticalSeam, VERTICAL);
+        while(carver.height() > 0) {
+            /*StdOut.printf("Vertical seam: { ");
+            int[] verticalSeam = carver.findVerticalSeam();
+            for (int x : verticalSeam)
+                StdOut.print(x + " ");
+            StdOut.println("}");
+            printSeam(carver, verticalSeam, VERTICAL);
+            carver.removeVerticalSeam(verticalSeam);*/
 
-        StdOut.printf("Horizontal seam: { ");
-        int[] horizontalSeam = carver.findHorizontalSeam();
-        for (int y : horizontalSeam)
-            StdOut.print(y + " ");
-        StdOut.println("}");
-        printSeam(carver, horizontalSeam, HORIZONTAL);
+            StdOut.printf("Horizontal seam: { ");
+            int[] horizontalSeam = carver.findHorizontalSeam();
+            for (int y : horizontalSeam)
+                StdOut.print(y + " ");
+            StdOut.println("}");
+            printSeam(carver, horizontalSeam, HORIZONTAL);
+            carver.removeHorizontalSeam(horizontalSeam);
+        }
 
     }
 }
