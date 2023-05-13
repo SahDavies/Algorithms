@@ -327,7 +327,7 @@ public class SeamCarver {
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\HJocean.png");
+        Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\chameleon.png");
         SeamCarver sc = new SeamCarver(input);
         for (int i = 0; i < 175; i++) {
             int[] seamH = sc.findVerticalSeam();
