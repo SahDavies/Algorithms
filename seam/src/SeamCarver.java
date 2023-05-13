@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class SeamCarver {
     private boolean isTranspose = false;
-    private int width, rows, cols;
+    private int rows, cols;
     private int[] picture;
     private double[][] energyTable;
 
@@ -18,7 +18,6 @@ public class SeamCarver {
         int m = picture.width();
         int n = picture.height();
         energyTable = new double[n][m];
-        width = m;
         rows = n;
         cols = m;
 
@@ -45,13 +44,13 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        int grid = picture.length;
-        int m = width;
-        int n = grid / m;
-        Picture pix = new Picture(m, n);
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                int cell = (i * m) + j;
+        int cols = (isTranspose) ? this.rows : this.cols;
+        int rows = (isTranspose) ? this.cols : this.rows;
+
+        Picture pix = new Picture(cols, rows);
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                int cell = (i * cols) + j;
                 int rgb = picture[cell];
                 pix.setRGB(j, i, rgb);
             }
@@ -61,12 +60,12 @@ public class SeamCarver {
 
     // width of current picture
     public int width() {
-        return width;
+        return (isTranspose) ? rows: cols;
     }
 
     // height of current picture
     public int height() {
-        return picture.length / width;
+        return (isTranspose) ? cols: rows;
     }
 
     // energy of pixel at column x and row y
@@ -78,13 +77,12 @@ public class SeamCarver {
     }
 
     private void validateY(int y) {
-        int height = picture.length / width;
-        if (y < 0 || y >= height)
+        if (y < 0 || y >= this.height())
             throw new IllegalArgumentException("Value is outside the prescribed height range");
     }
 
     private void validateX(int x) {
-        if (x < 0 || x >= width)
+        if (x < 0 || x >= this.width())
             throw new IllegalArgumentException("Value is outside the prescribed width range.");
     }
 
@@ -97,39 +95,19 @@ public class SeamCarver {
         if (x == 0 || x == width - 1) return edgeEnergy;
         if (y == 0 || y == height - 1) return edgeEnergy;
 
-        double dx = changeInX(x, y, pix);
-        double dy = changeInY(x, y, pix);
+        double dx = change(x,1, y, 0, pix);
+        double dy = change(x, 0, y, 1, pix);
         double sum = dx + dy;
         return Math.sqrt(sum);
     }
 
-    // calculates the sum of the central difference of the column
-    private static double changeInX(int x, int y, Picture pix) {
+    // calculates the sum of the central difference
+    private static double change(int x, int offsetX, int y, int offsetY, Picture pix) {
         int dr, dg, db;
         double sum;
 
-        int color1 = pix.getRGB(x + 1, y);
-        int color2 = pix.getRGB(x - 1, y);
-        int r1 = (color1 >> 16) & 0xFF, r2 = (color2 >> 16) & 0xFF;
-        int g1 = (color1 >>  8) & 0xFF, g2 = (color2 >>  8) & 0xFF;
-        int b1 = (color1 >>  0) & 0xFF, b2 = (color2 >>  0) & 0xFF;
-
-        // the central difference of r, g, and b
-        dr = r1 - r2;
-        dg = g1 - g2;
-        db = b1 - b2;
-
-        sum = Math.pow(dr, 2) + Math.pow(dg, 2) + Math.pow(db, 2);
-        return sum;
-    }
-
-    // calculates the sum of the central difference of the row
-    private static double changeInY(int x, int y, Picture pix) {
-        int dr, dg, db;
-        double sum;
-
-        int color1 = pix.getRGB(x, y + 1);
-        int color2 = pix.getRGB(x, y - 1);
+        int color1 = pix.getRGB(x + offsetX, y + offsetY);
+        int color2 = pix.getRGB(x - offsetX, y + offsetY);
         int r1 = (color1 >> 16) & 0xFF, r2 = (color2 >> 16) & 0xFF;
         int g1 = (color1 >>  8) & 0xFF, g2 = (color2 >>  8) & 0xFF;
         int b1 = (color1 >>  0) & 0xFF, b2 = (color2 >>  0) & 0xFF;
@@ -260,12 +238,11 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-        int height = picture.length / width;
         if (seam == null)
             throw new IllegalArgumentException("Null value supplied.");
-        if (height <= 1)
+        if (this.height() <= 1)
             throw new IllegalArgumentException("Image height is too small");
-        if (seam.length != width)
+        if (seam.length != this.width())
             throw new IllegalArgumentException("Invalid argument supplied.");
         for (int y : seam) { validateY(y); }
         for (int i = 0; i < (seam.length - 1); i++) {
@@ -281,10 +258,9 @@ public class SeamCarver {
 
     private void resizePictureRow(int[] seam) {
         // note that temp array is smaller than picture array
-        int grid = picture.length;
-        int[] temp = new int[grid - seam.length];
-        int cols = width;
-        int rows = (grid / cols) - 1;
+        int cols = (isTranspose) ? this.rows : this.cols;
+        int rows = (isTranspose) ? this.cols-1 : this.rows-1;
+        int[] temp = new int[(cols*rows)];
 
         for (int j = 0; j < cols; j++) {
             int offset = 0;
@@ -300,12 +276,11 @@ public class SeamCarver {
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
-        int height = picture.length / width;
         if (seam == null)
             throw new IllegalArgumentException("Null value supplied.");
-        if (width <= 1)
+        if (this.width() <= 1)
             throw new IllegalArgumentException("Image width cannot be further reduced.");
-        if (seam.length != height)
+        if (seam.length != this.height())
             throw new IllegalArgumentException("Invalid argument supplied.");
         for (int x : seam) { validateX(x); }
         for (int i = 0; i < (seam.length - 1); i++) {
@@ -334,10 +309,10 @@ public class SeamCarver {
     }
 
     private void resizePictureColumn(int[] seam) {
-        int grid = picture.length;
-        int[] temp = new int[grid - seam.length];   // temp array is smaller than picture array by seam.length
-        int cols = width - 1;
-        int rows = (grid / width);
+        // note that temp array is smaller than picture array
+        int cols = (isTranspose) ? this.rows-1 : this.cols-1;
+        int rows = (isTranspose) ? this.cols : this.rows;
+        int[] temp = new int[(cols*rows)];
         int shift = 0;
 
         for (int i = 0; i < rows; i++) {
@@ -348,7 +323,6 @@ public class SeamCarver {
             }
         }
         picture = temp;
-        width--;    // update width
     }
 
     //  unit testing (optional)
