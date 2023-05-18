@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class SeamCarver {
     private boolean isTranspose = false;
     private int rows, cols;
-    private int[] picture;
+    private int[][] picture;
     private double[][] energyTable;
 
     // create a seam carver object based on the given picture
@@ -28,15 +28,13 @@ public class SeamCarver {
         }
     }
 
-    private static int[] getData(Picture picture) {
+    private static int[][] getData(Picture picture) {
         int m = picture.width();
         int n = picture.height();
-        int grid = m * n;
-        int[] pix = new int[grid];
+        int[][] pix = new int[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                int cell = (i * m) + j;
-                pix[cell] = picture.getRGB(j, i);
+                pix[i][j] = picture.getRGB(j, i);
             }
         }
         return pix;
@@ -50,8 +48,7 @@ public class SeamCarver {
         Picture pix = new Picture(cols, rows);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                int cell = (i * cols) + j;
-                int rgb = picture[cell];
+                int rgb = (isTranspose) ? picture[j][i] : picture[i][j];
                 pix.setRGB(j, i, rgb);
             }
         }
@@ -123,13 +120,13 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        if (!isTranspose) { energyTable = transpose(); }
+        if (!isTranspose) { transpose(); }
         return findSeam();
     }
 
     // returns an array of indices representing the vertical seam
     public int[] findVerticalSeam() {
-        if (isTranspose) { energyTable = transpose(); }
+        if (isTranspose) { transpose(); }
         return findSeam();
     }
 
@@ -219,21 +216,24 @@ public class SeamCarver {
     }
 
     // auxiliary matrix transpose
-    private double[][] transpose() {
+    private void transpose() {
         final int m = rows;
         final int n = cols;
 
         double[][] aux = new double[n][m];
+        int[][] aux2 = new int[n][m];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 aux[j][i] = energyTable[i][j];
+                aux2[j][i] = picture[i][j];
             }
         }
         // interchange rows and cols
         rows = n;
         cols = m;
         isTranspose = !isTranspose;
-        return aux;
+        energyTable = aux;
+        picture = aux2;
     }
 
     // remove horizontal seam from current picture
@@ -251,27 +251,22 @@ public class SeamCarver {
                 throw new IllegalArgumentException("The difference between consecutive seam value is more than 1");
         }
 
-        if (!isTranspose) { energyTable = transpose(); }
-        resizePictureRow(seam);
+        if (!isTranspose) { transpose(); }
+        resizePicture(seam);
         resizeEnergyTable(seam);
     }
 
-    private void resizePictureRow(int[] seam) {
-        // note that temp array is smaller than picture array
-        int cols = (isTranspose) ? this.rows : this.cols;
-        int rows = (isTranspose) ? this.cols-1 : this.rows-1;
-        int[] temp = new int[(cols*rows)];
-
-        for (int j = 0; j < cols; j++) {
-            int offset = 0;
-            for (int i = 0; i < rows; i++) {
-                if (i == seam[j]) { offset++; }
-                int cell = (i * cols) + j;
-                int cell_Offset = (i + offset) * cols + j;
-                temp[cell] = picture[cell_Offset];
+    private void resizePicture(int[] seam) {
+        // shift the elements of each row in the array to the left
+        // starting from the index specified by seam[i]
+        for (int i = 0; i < rows; i++) {
+            int hold = picture[i][cols-1];
+            for (int j = cols-1; j >= seam[i]; j--) {
+                int temp = picture[i][j];
+                picture[i][j] = hold;
+                hold = temp;
             }
         }
-        picture = temp;
     }
 
     // remove vertical seam from current picture
@@ -289,8 +284,8 @@ public class SeamCarver {
                 throw new IllegalArgumentException("The difference between consecutive seam value is more than 1");
         }
 
-        if (isTranspose) { energyTable = transpose(); }
-        resizePictureColumn(seam);
+        if (isTranspose) { transpose(); }
+        resizePicture(seam);
         resizeEnergyTable(seam);
     }
 
@@ -308,30 +303,17 @@ public class SeamCarver {
         cols = cols-1; // update state
     }
 
-    private void resizePictureColumn(int[] seam) {
-        // note that temp array is smaller than picture array
-        int cols = (isTranspose) ? this.rows-1 : this.cols-1;
-        int rows = (isTranspose) ? this.cols : this.rows;
-        int[] temp = new int[(cols*rows)];
-        int shift = 0;
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int cell = (i * cols) + j;
-                if (j == seam[i])   shift++;
-                temp[cell] = picture[cell + shift];
-            }
-        }
-        picture = temp;
-    }
-
     //  unit testing (optional)
     public static void main(String[] args) {
         Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\chameleon.png");
         SeamCarver sc = new SeamCarver(input);
         for (int i = 0; i < 175; i++) {
-            int[] seamH = sc.findVerticalSeam();
-            sc.removeVerticalSeam(seamH);
+            int[] seamV = sc.findVerticalSeam();
+            sc.removeVerticalSeam(seamV);
+        }
+        for (int i = 0; i < 75; i++) {
+            int[] seamH = sc.findHorizontalSeam();
+            sc.removeHorizontalSeam(seamH);
         }
         input.show();
         Picture output = sc.picture();
