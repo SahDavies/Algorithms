@@ -50,7 +50,7 @@ public class BoggleSolver {
         return _contains(x.next[c - 'A'], key, d+1);
     }
 
-    public Iterable<String> keys() {
+    private Iterable<String> keys() {
         Queue<String> queue = new Queue<>();
         collect(root, "", queue);
         return queue;
@@ -92,14 +92,15 @@ public class BoggleSolver {
         int i = index / cols;
         int j = index % cols;
         char c = _board[i][j];
+        char offset = 'A';
 
-        x = x.next[c - 'A'];
+        x = x.next[c - offset];
         if (x == null) return;  // backtrack
         else marked[i][j] = true;   // mark as visited
 
-        if (c == 'Q' && x.next['U' - 'A'] != null) {
+        if (c == 'Q' && (x.next['U' - offset] != null)) {
             prefix = prefix + "QU";
-            x = x.next['U' - 'A'];
+            x = x.next['U' - offset];
         } else prefix = prefix + c;
 
         if (prefix.length() > 2 && x.isWord)

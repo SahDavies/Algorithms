@@ -15,25 +15,25 @@ public class SeamCarver {
         if (picture == null)
             throw new IllegalArgumentException("Invalid constructor argument");
         this.picture = getData(picture);
-        int m = picture.width();
-        int n = picture.height();
-        energyTable = new double[n][m];
-        rows = n;
-        cols = m;
+        int m = picture.height();
+        int n = picture.width();
+        energyTable = new double[m][n];
+        rows = m;
+        cols = n;
 
         // populate energy table
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < m; x++)
-                energyTable[y][x] = energyCalculator(x, y, picture);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++)
+                energyTable[i][j] = energyCalculator(j, i, picture);
         }
     }
 
     private static int[][] getData(Picture picture) {
-        int m = picture.width();
-        int n = picture.height();
-        int[][] pix = new int[n][m];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+        int m = picture.height();
+        int n = picture.width();
+        int[][] pix = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
                 pix[i][j] = picture.getRGB(j, i);
             }
         }
