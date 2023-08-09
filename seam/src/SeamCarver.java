@@ -143,13 +143,14 @@ public class SeamCarver {
         double[] distTo = new double[grid]; // stores the distance of each vertex from their source
         int[] edgeTo = new int[grid];       // a path from a vertex to its source vertex
 
-        // initialisation
-        Arrays.fill(distTo, Double.POSITIVE_INFINITY);
         // enqueue the source vertices
-        for (int i = 0; i < column; i++) {
+        for (int i = 0; i < grid; i++) {
             q.enqueue(i);
-            distTo[i] = 1000.0;
-            edgeTo[i] = i;
+            if(i < column) {
+                distTo[i] = 1000.0;
+                edgeTo[i] = i;
+            } else
+                distTo[i] = Double.POSITIVE_INFINITY;
         }
 
         // multiple source shortest-path algorithm
@@ -203,15 +204,12 @@ public class SeamCarver {
             Queue<Integer> q
     ) {
         int width = cols;
-        int height = rows;
         int x = w % width;
         int y = w / width;
 
         if (distTo[w] > distTo[v] + energyTable[y][x]) {
             distTo[w] = distTo[v] + energyTable[y][x];
             edgeTo[w] = v;
-            // do not add cells in the last row to queue
-            if (y < (height-1)) q.enqueue(w);
         }
     }
 
@@ -252,8 +250,7 @@ public class SeamCarver {
         }
 
         if (!isTranspose) { transpose(); }
-        resizePicture(seam);
-        resizeEnergyTable(seam);
+        resize(seam);
     }
 
     private void resizePicture(int[] seam) {
@@ -285,8 +282,13 @@ public class SeamCarver {
         }
 
         if (isTranspose) { transpose(); }
+        resize(seam);
+    }
+
+    private void resize(int[] seam) {
         resizePicture(seam);
         resizeEnergyTable(seam);
+        cols = cols-1; // update state
     }
 
     private void resizeEnergyTable(int[] seam) {
@@ -300,7 +302,6 @@ public class SeamCarver {
                 hold = temp;
             }
         }
-        cols = cols-1; // update state
     }
 
     //  unit testing (optional)
