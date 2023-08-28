@@ -28,18 +28,6 @@ public class SeamCarver {
         }
     }
 
-    private static int[][] getData(Picture picture) {
-        int m = picture.height();
-        int n = picture.width();
-        int[][] pix = new int[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                pix[i][j] = picture.getRGB(j, i);
-            }
-        }
-        return pix;
-    }
-
     // current picture
     public Picture picture() {
         int cols = (isTranspose) ? this.rows : this.cols;
@@ -58,6 +46,18 @@ public class SeamCarver {
     // width of current picture
     public int width() {
         return (isTranspose) ? rows: cols;
+    }
+
+    // sequence of indices for horizontal seam
+    public int[] findHorizontalSeam() {
+        if (!isTranspose) { transpose(); }
+        return findSeam();
+    }
+
+    // returns an array of indices representing the vertical seam
+    public int[] findVerticalSeam() {
+        if (isTranspose) { transpose(); }
+        return findSeam();
     }
 
     // height of current picture
@@ -118,16 +118,16 @@ public class SeamCarver {
         return sum;
     }
 
-    // sequence of indices for horizontal seam
-    public int[] findHorizontalSeam() {
-        if (!isTranspose) { transpose(); }
-        return findSeam();
-    }
-
-    // returns an array of indices representing the vertical seam
-    public int[] findVerticalSeam() {
-        if (isTranspose) { transpose(); }
-        return findSeam();
+    private static int[][] getData(Picture picture) {
+        int m = picture.height();
+        int n = picture.width();
+        int[][] pix = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                pix[i][j] = picture.getRGB(j, i);
+            }
+        }
+        return pix;
     }
 
     // returns an array of indices representing the seam
@@ -253,19 +253,6 @@ public class SeamCarver {
         resize(seam);
     }
 
-    private void resizePicture(int[] seam) {
-        // shift the elements of each row in the array to the left
-        // starting from the index specified by seam[i]
-        for (int i = 0; i < rows; i++) {
-            int hold = picture[i][cols-1];
-            for (int j = cols-1; j >= seam[i]; j--) {
-                int temp = picture[i][j];
-                picture[i][j] = hold;
-                hold = temp;
-            }
-        }
-    }
-
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
         if (seam == null)
@@ -285,6 +272,16 @@ public class SeamCarver {
         resize(seam);
     }
 
+    private void resizePicture(int[] seam) {
+        // shift the elements of each row in the array to the left
+        // starting from the index specified by seam[i]
+        for (int i = 0; i < rows; i++) {
+            for (int j = seam[i]+1; j < cols; j++) {
+                picture[i][j-1] = picture[i][j];
+            }
+        }
+    }
+
     private void resize(int[] seam) {
         resizePicture(seam);
         resizeEnergyTable(seam);
@@ -295,18 +292,15 @@ public class SeamCarver {
         // shift the elements of each row in the array to the left
         // starting from the index specified by seam[i]
         for (int i = 0; i < rows; i++) {
-            double hold = energyTable[i][cols-1];
-            for (int j = cols-1; j >= seam[i]; j--) {
-                double temp = energyTable[i][j];
-                energyTable[i][j] = hold;
-                hold = temp;
+            for (int j = seam[i]+1; j < cols; j++) {
+                energyTable[i][j-1] = energyTable[i][j];
             }
         }
     }
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\chameleon.png");
+        Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\HJocean.png");
         SeamCarver sc = new SeamCarver(input);
         for (int i = 0; i < 175; i++) {
             int[] seamV = sc.findVerticalSeam();

@@ -1,35 +1,3 @@
-/* *
-* Rules:
-* If there is only one item in the deque, first and last should point to the same item
-*
-* API
-*  // construct an empty deque
-    public Deque()
-
-    // is the deque empty?
-    public boolean isEmpty()
-
-    // return the number of items on the deque
-    public int size()
-
-    // add the item to the front
-    public void addFirst(Item item)
-
-    // add the item to the back
-    public void addLast(Item item)
-
-    // remove and return the item from the front
-    public Item removeFirst()
-
-    // remove and return the item from the back
-    public Item removeLast()
-
-    // return an iterator over items in order from front to back
-    public Iterator<Item> iterator()
-
-    // unit testing (required)
-    public static void main(String[] args)
-**/
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Iterator;
@@ -55,19 +23,12 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null)
             throw new IllegalArgumentException("Argument must not be null");
 
-        if (first == null) {
-            first = new Node();
-            first.item = item;
-            last = first;
-            size++;
-            return;
-        }
-
-        Node temp = first;
-        first = new Node();
-        first.item = item;
-        first.right = temp;
-        temp.left = first;
+        Node node = new Node();
+        node.item = item;
+        node.right = first;
+        if (first == null) last = node;
+        else first.left = node;
+        first = node;
         size++; // update size
     }
 
@@ -76,17 +37,15 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty())
             throw new NoSuchElementException();
 
-        if (size == 1) {
-            Item item = first.item;
+        Item item = first.item;
+
+        if (first == last) {
             first = null;
             last = null;
-            size--;
-            return item;
+        } else {
+            first = first.right;
+            first.left = null;
         }
-
-        Item item = first.item;
-        first = first.right;
-        first.left = null;
         size--; // update size
         return item;
     }
@@ -96,20 +55,13 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null)
             throw new IllegalArgumentException("Argument must not be null");
 
-        if (last == null) {
-            last = new Node();
-            last.item = item;
-            first = last;       // let last save a reference to the first item ever added
-            size++;
-            return;
-        }
-
-        Node oldLast = last;
-        last = new Node();
-        last.item = item;
-        last.left = oldLast;
-        oldLast.right = last;
-        size++; // update size
+        Node node = new Node();
+        node.item = item;
+        node.left = last;
+        if (last == null) first = node;     // last equalling null tells us that the deque was initially empty
+        else last.right = node;
+        last = node;
+        size++;
     }
 
     public Item removeLast() {
@@ -117,17 +69,15 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty())
             throw new NoSuchElementException();
 
-        if (size == 1) {
-            Item item = last.item;
-            last = null;
-            first = null;
-            size--;
-            return item;
-        }
-
         Item item = last.item;
-        last = last.left;
-        last.right = null;
+
+        if (last == first) {
+            first = null;
+            last = null;
+        } else {
+            last = last.left;
+            last.right = null;
+        }
         size--; // update size
         return item;
     }
@@ -177,7 +127,7 @@ public class Deque<Item> implements Iterable<Item> {
 
         // push items in from standard input
         for (int i = 0; i < 10; i++) {
-            stack.addFirst(i);
+            stack.addLast(i);
         }
         // display the number of items in stack
         StdOut.print("Number of items present in stack: " + stack.size());
@@ -190,12 +140,12 @@ public class Deque<Item> implements Iterable<Item> {
 
         // remove the least recent item
         StdOut.println();
-        StdOut.println("Least recent item: " + stack.removeLast());
+        StdOut.println("Most recent item: " + stack.removeLast());
 
         // pop items from the stack
         StdOut.print("\nItems in reverse order: ");
         while (!stack.isEmpty()) {
-            StdOut.print(stack.removeFirst() + " ");
+            StdOut.print(stack.removeLast() + " ");
         }
         StdOut.println("\nItems present in stack after pop operation: " + stack.size());
 
@@ -213,7 +163,7 @@ public class Deque<Item> implements Iterable<Item> {
         }
 
         // remove items from the queue
-        StdOut.print("\nItems in original order: ");
+        StdOut.print("\nPopping the queue...: ");
         while (!queue.isEmpty())
             StdOut.print(queue.removeFirst() + " ");
 
