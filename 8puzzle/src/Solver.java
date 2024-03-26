@@ -69,7 +69,7 @@ public class Solver {
     }
     // adds new search node to priority queue
     private static void addSearchNode(SearchNode node, MinPQ<SearchNode> minPQ) {
-        SearchNode previous = node.previous;
+        boolean isRepeated;
         for (Board board:
                 node.board.neighbors()) {
             /* *
@@ -77,10 +77,9 @@ public class Solver {
              * check that neighboring boards doesn't correspond to a previous board
              * */
             // check whether previous node points to null
-            if (previous == null)
-                minPQ.insert(new SearchNode(board, node.moves + 1, node));
-            else if (!board.equals(previous.board))
-                minPQ.insert(new SearchNode(board, node.moves + 1, node));
+            if (node.previous == null) isRepeated = false;
+            else isRepeated = board.equals(node.previous.board);
+            if (!isRepeated) minPQ.insert(new SearchNode(board, node.moves + 1, node));
         }
     }
 
@@ -115,13 +114,13 @@ public class Solver {
         return stack;
     }
     public static void main(String[] args) {
-        int n = StdIn.readInt();
-        int[][] tiles = new int[n][n];
-        for (int row = 0; row < n; row++) {
+        // int n = StdIn.readInt();
+        int[][] tiles = {{0,1,3}, {4,2,5}, {7,8,6}};    //new int[n][n];
+        /*for (int row = 0; row < n; row++) {
             for (int col = 0; col < n; col++) {
                 tiles[row][col] = StdIn.readInt();
             }
-        }
+        }*/
         Board initial = new Board(tiles);
 
         // solve the puzzle

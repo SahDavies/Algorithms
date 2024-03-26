@@ -20,8 +20,7 @@ public class NearestNeighborVisualizer {
     public static void main(String[] args) {
 
         // initialize the two data structures with point from file
-        String filename = args[0];
-        In in = new In(filename);
+        In in = new In("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\kdtree\\circle100.txt");
         PointSET brute = new PointSET();
         KdTree kdtree = new KdTree();
         while (!in.isEmpty()) {

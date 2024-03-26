@@ -3,12 +3,10 @@ import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.Arrays;
-
 public class BoggleSolver {
     private static final int R = 26;    // Alphabets of the English language
 
-    private Node root;
+    private Node treeRoot;
     private char[][] _board;
     private boolean[][] marked;
     private int rows;
@@ -25,12 +23,12 @@ public class BoggleSolver {
         if (dictionary == null || dictionary.length == 0)
             throw new IllegalArgumentException("Empty constructor argument");
 
-        root = new Node();
+        treeRoot = new Node();
         for (String word : dictionary) { addToTrie(word); }
     }
 
     private void addToTrie(String word) {
-        root = put(root, word, 0);
+        treeRoot = put(treeRoot, word, 0);
     }
 
     private static Node put(Node x, String key, int d) {
@@ -41,7 +39,7 @@ public class BoggleSolver {
         return x;
     }
 
-    private boolean contains(String word) { return _contains(root, word, 0); }
+    private boolean contains(String word) { return _contains(treeRoot, word, 0); }
 
     private boolean _contains(Node x, String key, int d) {
         if (x == null) return false;
@@ -52,7 +50,7 @@ public class BoggleSolver {
 
     private Iterable<String> keys() {
         Queue<String> queue = new Queue<>();
-        collect(root, "", queue);
+        collect(treeRoot, "", queue);
         return queue;
     }
 
@@ -83,7 +81,7 @@ public class BoggleSolver {
         SET<String> words = new SET<>();
         // call DFS on each cell on the board
         for (int cell = 0; cell < rows * cols; cell++) {
-            DFS(cell, words, root, "");
+            DFS(cell, words, treeRoot, "");
         }
         return words;
     }
@@ -107,12 +105,12 @@ public class BoggleSolver {
             words.add(prefix);
 
         // data used to visit the neighbors of a cell
-        final int[] shift_I = { -1, -1, -1, 0, 0, 0, 1, 1, 1};
-        final int[] shift_J = { -1, 0, 1 ,-1, 0, 1, -1, 0, 1};
+        final int[] offset_I = { -1, -1, -1, 0, 0, 0, 1, 1, 1};
+        final int[] offset_J = { -1, 0, 1 ,-1, 0, 1, -1, 0, 1};
 
-        for (int k = 0; k < shift_I.length; k++) {
-            int _i = i + shift_I[k];
-            int _j = j + shift_J[k];
+        for (int k = 0; k < offset_I.length; k++) {
+            int _i = i + offset_I[k];
+            int _j = j + offset_J[k];
             if (inRange(_i, _j) && !marked[_i][_j]) {
                 int cell = _i*cols + _j;
                 DFS(cell, words, x, prefix);

@@ -6,7 +6,7 @@ public class Inversion {
      * It does so in O(NlogN) time.
      * */
     private final Map<Integer, List<Integer>> inversion;
-    private int size;
+    private final int size;
 
     // prevent constructor instantiation
     private Inversion (Map<Integer, List<Integer>> inversion, int size) {
