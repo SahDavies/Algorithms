@@ -22,24 +22,22 @@ public class KdTree {
         if (p == null)
             throw new IllegalArgumentException("Null value was supplied");
 
-        RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
-        root = insert(root, p, rect, Orientation.VERTICAL);
+        root = insert(root, p, Orientation.VERTICAL);
     }
 
-    private Node insert(Node node, Point2D point, RectHV rect, Orientation orientation) {
+    private Node insert(Node node, Point2D point, Orientation orientation) {
         if (node == null) {
             size += 1;
-            return new Node(point, rect);
+            return new Node(point);
         }
         if (point.equals(node.point))   return node;
 
         boolean isLess = isLess(orientation, point, node.point);
-        rect = assignRectHV(orientation, isLess, node);
 
         if (isLess) {
-            node.left = insert(node.left, point, rect, orientation.other());
+            node.left = insert(node.left, point, orientation.other());
         } else {
-            node.right = insert(node.right, point, rect, orientation.other());
+            node.right = insert(node.right, point, orientation.other());
         }
         return node;
     }
@@ -53,38 +51,15 @@ public class KdTree {
         return cmp < 0;
     }
 
-    private RectHV assignRectHV(Orientation orientation, boolean isLess, Node node) {
-        // instantiate a RectHV data type if it is leaf node otherwise use the cached instance
-        RectHV rect;
-        if (isLess && node.left == null)
-            rect = instantiateRectHV(orientation, isLess, node);
-        else if (isLess)
-            rect = node.left.rect;
-        else if (node.right == null)
-            rect = instantiateRectHV(orientation, isLess, node);
-        else
-            rect = node.right.rect;
-        return rect;
-    }
-
-    private RectHV instantiateRectHV(Orientation orientation, boolean isLess, Node node) {
-        RectHV rect = node.rect;
-        Point2D point = node.point;
-        RectHV newInstance;
-
-        if (isLess) {
-            newInstance = switch(orientation) {
-                case VERTICAL -> new RectHV(rect.xmin(), rect.ymin(), point.x(), rect.ymax());
-                case HORIZONTAL -> new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), point.y());
-            };
-        } else {
-            newInstance = switch (orientation) {
-                case VERTICAL -> new RectHV(point.x(), rect.ymin(), rect.xmax(), rect.ymax());
-                case HORIZONTAL -> new RectHV(rect.xmin(), point.y(), rect.xmax(), rect.ymax());
-            };
-        }
-
-        return newInstance;
+    private RectHV splitRectHV(Orientation orientation, boolean isLess,RectHV rect, Point2D point) {
+        return switch (orientation) {
+            case VERTICAL -> (isLess)
+                    ? new RectHV(rect.xmin(), rect.ymin(), point.x(), rect.ymax())
+                    : new RectHV(point.x(), rect.ymin(), rect.xmax(), rect.ymax());
+            case HORIZONTAL -> (isLess)
+                    ? new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), point.y())
+                    : new RectHV(rect.xmin(), point.y(), rect.xmax(), rect.ymax());
+        };
     }
 
     public boolean contains(Point2D p) {
@@ -108,16 +83,21 @@ public class KdTree {
         return result;
     }
     public void draw() {
-        draw(root, Orientation.VERTICAL);
+        RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
+        draw(root, rect, Orientation.VERTICAL);
     }
 
-    private void draw(Node node, Orientation orientation) {
+    private void draw(Node node, RectHV rect,Orientation orientation) {
         if (node == null)   return;     // exit condition
 
         drawPoint(node.point);
-        drawSplittingLine(node, orientation);
-        draw(node.left, orientation.other());
-        draw(node.right, orientation.other());
+        drawSplittingLine(node, rect, orientation);
+
+        RectHV leftRect = splitRectHV(orientation, true, rect, node.point);
+        RectHV rightRect = splitRectHV(orientation, false, rect, node.point);
+
+        draw(node.left, leftRect, orientation.other());
+        draw(node.right, rightRect, orientation.other());
     }
 
     private void drawPoint(Point2D point) {
@@ -126,16 +106,16 @@ public class KdTree {
         point.draw();
     }
 
-    private void drawSplittingLine(Node node, Orientation orientation) {
+    private void drawSplittingLine(Node node, RectHV rect, Orientation orientation) {
         StdDraw.setPenRadius();
         if (orientation == Orientation.VERTICAL) {
             StdDraw.setPenColor(StdDraw.RED);
-            StdDraw.line(node.point.x(), node.rect.ymin(),
-                         node.point.x(), node.rect.ymax());
+            StdDraw.line(node.point.x(), rect.ymin(),
+                         node.point.x(), rect.ymax());
         } else {
             StdDraw.setPenColor(StdDraw.BLUE);
-            StdDraw.line(node.rect.xmin(), node.point.y(),
-                         node.rect.xmax(), node.point.y());
+            StdDraw.line(rect.xmin(), node.point.y(),
+                         rect.xmax(), node.point.y());
         }
     }
 
@@ -180,16 +160,24 @@ public class KdTree {
         if (p == null)
             throw new IllegalArgumentException("Null value was supplied");
 
-        double minDistance = Double.POSITIVE_INFINITY;
-        return nearest(minDistance, p, null, root, Orientation.VERTICAL);
+        double distance = Double.POSITIVE_INFINITY;
+        RectHV rect = new RectHV(0.0, 0.0, 1.0, 1.0);
+        return nearest(distance, p, null, rect, root, Orientation.VERTICAL);
     }
 
-    private Point2D nearest(double distance, Point2D p, Point2D champion,
-                            Node node, Orientation orientation) {
+    private Point2D nearest(double distance,
+                            Point2D queryPoint,
+                            Point2D champion,
+                            RectHV rect,
+                            Node node,
+                            Orientation orientation) {
         if (node == null) return champion;  // exit condition
-        boolean isLess = isLess(orientation, p, node.point);
+        boolean isLess = isLess(orientation, queryPoint, node.point);
         double minDistance = distance;
-        distance = p.distanceSquaredTo(node.point);
+        RectHV leftRect = splitRectHV(orientation, true, rect, node.point);
+        RectHV rightRect = splitRectHV(orientation, false, rect, node.point);
+
+        distance = queryPoint.distanceSquaredTo(node.point);
 
         if (distance < minDistance) {
             minDistance = distance;
@@ -198,8 +186,9 @@ public class KdTree {
 
         // explore subtrees closer to the query point
         if (isLess) {
-            champion = nearest(minDistance, p, champion, node.left, orientation.other());
-            minDistance = champion.distanceSquaredTo(p);
+
+            champion = nearest(minDistance, queryPoint, champion, leftRect, node.left, orientation.other());
+            minDistance = champion.distanceSquaredTo(queryPoint);
 
             /* * after exploring left subtree, explore right subtree
             * if the distance from query point to champion is greater than
@@ -207,11 +196,11 @@ public class KdTree {
             * the right subtree
             * */
             if (node.right != null
-                    && minDistance > node.right.rect.distanceSquaredTo(p))
-                champion = nearest(minDistance, p, champion, node.right, orientation.other());
+                    && minDistance > rightRect.distanceSquaredTo(queryPoint))
+                champion = nearest(minDistance, queryPoint, champion, rightRect, node.right, orientation.other());
         } else {
-            champion = nearest(minDistance, p, champion, node.right, orientation.other());
-            minDistance = champion.distanceSquaredTo(p);
+            champion = nearest(minDistance, queryPoint, champion, rightRect, node.right, orientation.other());
+            minDistance = champion.distanceSquaredTo(queryPoint);
 
             /* * after exploring right subtree, explore left subtree
              * if the distance from query point to champion is greater than
@@ -219,21 +208,19 @@ public class KdTree {
              * the left subtree
              * */
             if (node.left != null
-                    && minDistance > node.left.rect.distanceSquaredTo(p))
-                champion = nearest(minDistance, p, champion, node.left, orientation.other());
+                    && minDistance > leftRect.distanceSquaredTo(queryPoint))
+                champion = nearest(minDistance, queryPoint, champion, leftRect, node.left, orientation.other());
         }
         return champion;
     }
 
     private static class Node {
         private final Point2D point;
-        private final RectHV rect;    // rectangle enclosing the point
         private Node left;        // left node or bottom rectangle
         private Node right;        // right node or top rectangle
 
-        Node(Point2D point, RectHV rect) {
+        Node(Point2D point) {
             this.point = point;
-            this.rect = rect;
         }
     }
 
