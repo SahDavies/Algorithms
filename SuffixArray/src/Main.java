@@ -67,9 +67,13 @@ public class Main {
                 "Mechatronics Engineering"
         );
 
-        compareSearchRunTimeOfGSuffArrayandTST(strings, "ology");
+        /*List<String> largeStrings = IntStream.range(0, 1_000_000)
+                .mapToObj(index -> index + " Hello") // Or just "Hello" if content is uniform
+                .toList();*/
 
-        CompareRunningTimeofStandardSortAndGSuffArray(strings, list -> Quick3string.sort(list.toArray(new String[0])));
+        compareSearchRunTimeOfGSuffArrayandTST(strings, "lo");
+
+        Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(strings, list -> Quick3string.sort(list.toArray(new String[0])));
 
     }
 
@@ -116,7 +120,7 @@ public class Main {
         }
     }
 
-    private static void CompareRunningTimeofStandardSortAndGSuffArray(List<String> strings , Consumer<List<Comparable>> sort) {
+    private static void Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(List<String> strings , Consumer<List<Comparable>> sort) {
 
         double elapsedTime;
 

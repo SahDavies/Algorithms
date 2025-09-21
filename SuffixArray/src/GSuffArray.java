@@ -1,6 +1,9 @@
 import edu.princeton.cs.algs4.Quick3string;
-import java.util.ArrayList;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 public class GSuffArray {
     private static final int CUTOFF = 5;   // cutoff to insertion sort
@@ -20,7 +23,7 @@ public class GSuffArray {
 
         // 1) build sentinel-appended char arrays and compute max length
         for (int t = 0; t < m; t++) {
-            this.texts[t] = (inputTexts[t] + '\0').toCharArray();
+            this.texts[t] = (inputTexts[t].toLowerCase() + '\0').toCharArray();
         }
 
         // 2) compute offsets and total character count
@@ -98,13 +101,23 @@ public class GSuffArray {
         index[j] = tmp;
     }
 
-    // find which text a flat code belongs to via offsets[]
+     /**
+      * Find index of which text a flat code belongs to via offsets[].
+      * Since offsets array contains a monotonic sequence, we use binary search
+      * to return this index in O(log n) time.
+      * */
     private int textId(int code) {
-        // simple linear scan (m is usually small)
-        for (int t = m - 1; t >= 0; t--) {
-            if (code >= offsets[t]) return t;
+        int lo = 0;
+        int hi = offsets.length - 1;
+        while (lo <= hi) {
+            // Code is in a[lo..hi].
+            int mid = lo + (hi - lo) / 2;
+            if      (code < offsets[mid]) hi = mid - 1;
+            else if (code > offsets[mid]) lo = mid + 1;
+            else return mid;
         }
-        return 0;
+
+        return hi;
     }
 
     // compute position within its text
@@ -139,28 +152,35 @@ public class GSuffArray {
      * Given a query prefix, returns an iterable of original texts that contain the given prefix.
      */
     public Iterable<String> texts(String query) {
+        Set<String> result = new HashSet<>();
+
+        for (int index :
+                indices(query)) {
+            char[] txt = texts[index];
+            result.add(new String(txt, 0, txt.length - 1));
+        }
+
+        return result;
+    }
+
+    public Iterable<Integer> indices(String query) {
+        String queryLowerCase = query.toLowerCase();
         // find the range of suffixes that start with 'query'
-        int start = rank(query);
+        int start = rank(queryLowerCase);
         // use a high “sentinel” to find the upper bound
-        String hiQuery = query + '\uffff';
+        String hiQuery = queryLowerCase + '\uffff';
         int end = rank(hiQuery);
 
-        boolean[] seen = new boolean[m];
-        List<String> result = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
 
         // collect each distinct text ID in [start..end)
         for (int i = start; i < end; i++) {
             int code = index[i];
             int t = textId(code);
-            if (!seen[t]) {
-                seen[t] = true;
-                // rebuild the original string (drop the trailing '\0')
-                char[] txt = texts[t];
-                result.add(new String(txt, 0, txt.length - 1));
-            }
+            set.add(t);
         }
 
-        return result;
+        return set;
     }
 
 
@@ -173,10 +193,11 @@ public class GSuffArray {
      */
     public int rank(String query) {
         int lo = 0, hi = index.length - 1;
+        String queryLowerCase = query.toLowerCase();
         while (lo <= hi) {
             int mid = lo + (hi - lo) / 2;
             int code = index[mid];
-            int cmp = compareSuffixToQuery(code, query);
+            int cmp = compareSuffixToQuery(code, queryLowerCase);
             if (cmp < 0) {
                 // suffix < query → go right
                 lo = mid + 1;
