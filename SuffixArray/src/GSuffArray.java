@@ -153,15 +153,7 @@ public class GSuffArray {
      * Given a query prefix, returns an iterable of original texts that contain the given prefix.
      */
     public Iterable<String> texts(String query) {
-        Set<String> result = new HashSet<>();
-
-        for (int index :
-                indices(query)) {
-            char[] txt = texts[index];
-            result.add(new String(txt, 0, txt.length - 1));
-        }
-
-        return result;
+        return mapIdsToTexts(indices(query));
     }
 
     public Iterable<String> permutationAgnosticSearch(String query) {
@@ -177,15 +169,7 @@ public class GSuffArray {
             accumulator.retainAll(indices(subTexts[i]));
         }
 
-        // 3) Map the text IDs back to the original strings
-        Set<String> result = new HashSet<>();
-        for (int textId : accumulator) {
-            char[] txt = texts[textId];
-            // Remove the sentinel '\0' when converting back to String
-            result.add(new String(txt, 0, txt.length - 1));
-        }
-
-        return result;
+        return mapIdsToTexts(accumulator);
     }
 
     public Set<Integer> indices(String query) {
@@ -206,6 +190,15 @@ public class GSuffArray {
         }
 
         return set;
+    }
+
+    private Set<String> mapIdsToTexts(Set<Integer> ids) {
+        Set<String> result = new HashSet<>();
+        for (int id : ids) {
+            char[] txt = texts[id];
+            result.add(new String(txt, 0, txt.length - 1));
+        }
+        return result;
     }
 
 
