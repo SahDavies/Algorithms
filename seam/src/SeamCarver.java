@@ -1,16 +1,51 @@
-import edu.princeton.cs.algs4.Picture;
-import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.*;
 
 import java.util.Arrays;
 
 
 public class SeamCarver {
+    private class Node {
+        int[] item;
+        Node prev;
+    }
+
+    private Node topNode = null;
+    private int size = 0;
+
+    private boolean isEmpty() {
+        return topNode == null;
+    }
+
+    private void push(int[] item) {
+        Node oldNode = topNode;
+        topNode = new Node();
+        topNode.item = item;
+        topNode.prev = oldNode;
+        size++;
+    }
+
+    private void pop() {
+        if (isEmpty()) return;
+        topNode = topNode.prev;
+        size--;
+    }
+
+    private int[] peek() throws RuntimeException {
+        if(isEmpty())
+            throw new RuntimeException("The stack is empty." +
+                " Failed attempt to peek from stack");
+        return topNode.item;
+    }
+    /** ............End of stack algorithm............ */
     private boolean isTranspose = false;
     private int rows, cols;
     private int[][] picture;
     private double[][] energyTable;
 
-    // create a seam carver object based on the given picture
+    // private no argument constructor; required for executing unit tests
+    private SeamCarver() {}
+
+    // public constructor
     public SeamCarver(Picture picture) {
         if (picture == null)
             throw new IllegalArgumentException("Invalid constructor argument");
@@ -172,6 +207,7 @@ public class SeamCarver {
 
         int v = minEnergySeamIndex(distTo, grid, column);
         int[] seam = getSeam(column, row, edgeTo, v);
+        push(seam); // add coordinates to stack
         return seam;
     }
 
@@ -272,12 +308,29 @@ public class SeamCarver {
         resize(seam);
     }
 
+    public void restorePicture(int width, int height) throws IllegalArgumentException {
+        if(width+height > size)
+            throw new IllegalArgumentException("Dimension [width, height] provided exceeds bound.");
+        /**
+         * 1. check orientation to know what top item [they represent coordinate] of stack corresponds to
+         * 2. Use this coordinate to restore the corresponding seam on the energy matrix, pop the coordinate from stack,
+         *    decrease the corresponding coordinate from the given dimension.
+         * 3. Update the matrix row/column property to reflect the change.
+         * 4. When a change in length of an item on the stack is encountered, it informs a change in orientation.
+         * 5. Repeat this process until the dimension is (0,0)
+         *    */
+    }
+
     private void resizePicture(int[] seam) {
         // shift the elements of each row in the array to the left
         // starting from the index specified by seam[i]
         for (int i = 0; i < rows; i++) {
-            for (int j = seam[i]+1; j < cols; j++) {
-                picture[i][j-1] = picture[i][j];
+            int prevElement = picture[i][cols-1];
+            for (int j = cols-1; j >= seam[i]; j--) {
+                int temp = picture[i][j];
+                picture[i][j] = prevElement;
+                prevElement = temp;
+                if (j == seam[i]) picture[i][cols-1] = prevElement;
             }
         }
     }
@@ -290,19 +343,65 @@ public class SeamCarver {
 
     private void resizeEnergyTable(int[] seam) {
         // shift the elements of each row in the array to the left
-        // starting from the index specified by seam[i]
+        // using move-to-front algorithm in the reverse order
         for (int i = 0; i < rows; i++) {
-            for (int j = seam[i]+1; j < cols; j++) {
-                energyTable[i][j-1] = energyTable[i][j];
+            double prevElement = energyTable[i][cols-1];
+            for (int j = cols-1; j >= seam[i]; j--) {
+                double temp = energyTable[i][j];
+                energyTable[i][j] = prevElement;
+                prevElement = temp;
+                if (j == seam[i]) energyTable[i][cols-1] = prevElement;
             }
         }
     }
 
     //  unit testing (optional)
     public static void main(String[] args) {
+//        stackUnitTest();
+
+        Stopwatch timer = new Stopwatch();
+        seamsUnitTest();
+        double time = timer.elapsedTime();
+        StdOut.printf("Elapsed time : (%.2f seconds)\n", time);
+    }
+
+    private static void stackUnitTest() {
+        SeamCarver stack = new SeamCarver();
+
+        System.out.println("""
+                Enter multiple arrays of int value, separating each row by '-'
+                Example: An array of three rows can be represented as such
+                3001-3245-203
+                """);
+
+        String input = StdIn.readString();
+        String[] items = input.split("-");
+        for (String item : items) {
+            int[] array = item.codePoints()
+                    .map( codePoint -> {
+                        return codePoint - '0';
+                    })
+                    .toArray();
+            stack.push(array);
+        }
+
+        StdOut.printf("\nstack size: %d", stack.size);
+        StdOut.print("\nItems present in the stack: ");
+        while(!stack.isEmpty()) {
+            try {
+                System.out.println(Arrays.toString(stack.peek()));;
+            } catch (RuntimeException e) {
+                System.out.println(e.toString());
+            }
+            stack.pop();
+        }
+        StdOut.printf("\nstack size: %d", stack.size);
+    }
+
+    private static void seamsUnitTest() {
         Picture input = new Picture("C:\\Users\\HP\\Documents\\Cousera\\Algorithms Part II\\Test files\\seam\\HJocean.png");
         SeamCarver sc = new SeamCarver(input);
-        for (int i = 0; i < 175; i++) {
+        for (int i = 0; i < 215; i++) {
             int[] seamV = sc.findVerticalSeam();
             sc.removeVerticalSeam(seamV);
         }

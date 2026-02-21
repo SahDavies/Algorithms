@@ -1,5 +1,6 @@
 import edu.princeton.cs.algs4.Quick3string;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,7 +164,31 @@ public class GSuffArray {
         return result;
     }
 
-    public Iterable<Integer> indices(String query) {
+    public Iterable<String> permutationAgnosticSearch(String query) {
+        String[] subTexts = query.toLowerCase().split("\\s+");
+        if (subTexts.length == 0) return Collections.emptySet();
+
+        // 1) Seed the accumulator with the indices of the first word
+        Set<Integer> accumulator = new HashSet<>(indices(subTexts[0]));
+
+        // 2) Intersect with the indices of all remaining words
+        for (int i = 1; i < subTexts.length; i++) {
+            if (accumulator.isEmpty()) break; // Early exit if no common documents remain
+            accumulator.retainAll(indices(subTexts[i]));
+        }
+
+        // 3) Map the text IDs back to the original strings
+        Set<String> result = new HashSet<>();
+        for (int textId : accumulator) {
+            char[] txt = texts[textId];
+            // Remove the sentinel '\0' when converting back to String
+            result.add(new String(txt, 0, txt.length - 1));
+        }
+
+        return result;
+    }
+
+    public Set<Integer> indices(String query) {
         String queryLowerCase = query.toLowerCase();
         // find the range of suffixes that start with 'query'
         int start = rank(queryLowerCase);

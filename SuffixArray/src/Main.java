@@ -1,4 +1,3 @@
-import edu.princeton.cs.algs4.Quick3string;
 import edu.princeton.cs.algs4.Stopwatch;
 import edu.princeton.cs.algs4.TST;
 
@@ -71,10 +70,17 @@ public class Main {
                 .mapToObj(index -> index + " Hello") // Or just "Hello" if content is uniform
                 .toList();*/
 
-        compareSearchRunTimeOfGSuffArrayandTST(strings, "lo");
+//        compareSearchRunTimeOfGSuffArrayandTST(largeStrings, "lo");
 
-        Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(strings, list -> Quick3string.sort(list.toArray(new String[0])));
+//        Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(largeStrings, list -> Quick3string.sort(list.toArray(new String[0])));
 
+        double elapsedTimeSuffixArray;
+
+        Stopwatch timerSuffixArray = new Stopwatch();
+        GSuffArray sa = new GSuffArray(strings.toArray(new String[0]));
+        printTextThatContainsPrefix(sa.permutationAgnosticSearch("rural management development"));
+        elapsedTimeSuffixArray = timerSuffixArray.elapsedTime();
+        System.out.printf("\nSearch running time GSuffArray: %f\n\n", elapsedTimeSuffixArray);
     }
 
     private static void compareSearchRunTimeOfGSuffArrayandTST(List<String> strings, String prefix) {
