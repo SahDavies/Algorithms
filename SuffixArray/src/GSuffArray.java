@@ -165,7 +165,7 @@ public class GSuffArray {
     }
 
     public Iterable<String> permutationAgnosticSearch(String query) {
-        String[] subTexts = query.toLowerCase().split("\\s+");
+        String[] subTexts = query.split("\\s+");
         if (subTexts.length == 0) return Collections.emptySet();
 
         // 1) Seed the accumulator with the indices of the first word
