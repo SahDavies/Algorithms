@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) {
-        List<String> strings = List.of(
+        /*List<String> strings = List.of(
                 "COLLEGE OF ENGINEERING",
                 "COLLEGE OF VETERINARY MEDICINE",
                 "COLLEGE OF PLANT SCIENCE AND CROP PRODUCTION",
@@ -64,23 +64,23 @@ public class Main {
                 "Electrical and Electronics Engineering",
                 "Mechanical Engineering",
                 "Mechatronics Engineering"
-        );
+        );*/
 
-        /*List<String> largeStrings = IntStream.range(0, 1_000_000)
+        List<String> largeStrings = IntStream.range(0, 1_000_000)
                 .mapToObj(index -> index + " Hello") // Or just "Hello" if content is uniform
-                .toList();*/
+                .toList();
 
 //        compareSearchRunTimeOfGSuffArrayandTST(largeStrings, "lo");
 
-//        Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(largeStrings, list -> Quick3string.sort(list.toArray(new String[0])));
+        Compare_Construction_Time_of_SuffixArrays("GSuffArrayX",largeStrings, list -> new GSuffArrayX(list.toArray(new String[0])));
 
-        double elapsedTimeSuffixArray;
-
-        Stopwatch timerSuffixArray = new Stopwatch();
-        GSuffArray sa = new GSuffArray(strings.toArray(new String[0]));
-        printTextThatContainsPrefix(sa.permutationAgnosticSearch("rural management development"));
-        elapsedTimeSuffixArray = timerSuffixArray.elapsedTime();
-        System.out.printf("\nSearch running time GSuffArray: %f\n\n", elapsedTimeSuffixArray);
+//        double elapsedTimeSuffixArray;
+//
+//        Stopwatch timerSuffixArray = new Stopwatch();
+//        GSuffArray sa = new GSuffArray(largeStrings.toArray(new String[0]));
+//        printTextThatContainsPrefix(sa.permutationAgnosticSearch("science college"));
+//        elapsedTimeSuffixArray = timerSuffixArray.elapsedTime();
+//        System.out.printf("\nSearch running time GSuffArray: %f\n\n", elapsedTimeSuffixArray);
     }
 
     private static void compareSearchRunTimeOfGSuffArrayandTST(List<String> strings, String prefix) {
@@ -126,7 +126,7 @@ public class Main {
         }
     }
 
-    private static void Compare_Construction_Time_of_Standard_ArbitrarySortAlgorithm_And_GSuffArray(List<String> strings , Consumer<List<Comparable>> sort) {
+    private static void Compare_Construction_Time_of_SuffixArrays(String algorithmName, List<String> strings , Consumer<List<String>> sort) {
 
         double elapsedTime;
 
@@ -139,18 +139,9 @@ public class Main {
 
         // running time for standard sort
         Stopwatch timerQuick3Way = new Stopwatch();
-        List<Comparable> subStrings = strings.stream()
-                .flatMap(str ->
-                        IntStream.range(0, str.length())
-                                .boxed()
-                                .flatMap(i ->
-                                        IntStream.rangeClosed(i + 1, str.length())
-                                                .mapToObj(j -> (Comparable) str.substring(i, j))
-                                )
-                ).toList();
-        sort.accept(subStrings);
+        sort.accept(strings);
 
         elapsedTime = timerQuick3Way.elapsedTime();
-        System.out.printf("Quick3string Implementation: %f\n\n", elapsedTime);
+        System.out.printf("%s Implementation: %f\n\n",algorithmName, elapsedTime);
     }
 }
